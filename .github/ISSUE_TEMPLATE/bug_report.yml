@@ -1,0 +1,63 @@
+name: 🐞 Bug report
+description: Segnala un errore riproducibile
+labels: ["type:bug", "status:needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: "Grazie per la segnalazione. Compila tutti i campi per velocizzare il triage."
+  - type: textarea
+    id: description
+    attributes:
+      label: Descrizione del problema
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Passi per riprodurre
+      placeholder: |
+        1. Comando eseguito
+        2. Config usata
+        3. Errore osservato
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento atteso
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log e traceback completo
+      render: shell
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area interessata
+      options: [model, training, inference, data, agents, infra, docs]
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Versione / commit SHA
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: Ambiente
+      placeholder: "OS, Python, PyTorch, CUDA, GPU, VRAM, numero di nodi"
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Verifiche
+      options:
+        - label: Ho cercato tra le issue esistenti
+          required: true
+        - label: Sto usando una versione supportata
+          required: true

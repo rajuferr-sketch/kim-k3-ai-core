@@ -1,0 +1,13 @@
+# Proprietari del codice — review richiesta automaticamente
+
+*                       @rajuferr-sketch
+
+/src/kimk3/model/       @rajuferr-sketch
+/src/kimk3/train/       @rajuferr-sketch
+/src/kimk3/infer/       @rajuferr-sketch
+/src/kimk3/agents/      @rajuferr-sketch
+/src/kimk3/data/        @rajuferr-sketch
+/docs/                  @rajuferr-sketch
+/.github/               @rajuferr-sketch
+SECURITY.md             @rajuferr-sketch
+MODEL_CARD.md           @rajuferr-sketch

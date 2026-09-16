@@ -1,0 +1,39 @@
+name: ✨ Feature request
+description: Proponi una nuova funzionalità o miglioria
+labels: ["type:feature", "status:needs-triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema da risolvere
+      description: Qual è il limite attuale?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Soluzione proposta
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative considerate
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area interessata
+      options: [model, training, inference, data, agents, infra, docs]
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: Riferimenti
+      description: Paper, repository o implementazioni di riferimento
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Disponibilità
+      options:
+        - label: Sono disponibile a implementare questa funzionalità

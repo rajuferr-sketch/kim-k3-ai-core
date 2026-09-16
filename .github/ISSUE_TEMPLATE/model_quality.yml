@@ -1,0 +1,55 @@
+name: 🧠 Qualità del modello
+description: Risposte errate, allucinazioni o degrado sui benchmark
+labels: ["type:quality", "area:model", "status:needs-triage"]
+body:
+  - type: textarea
+    id: prompt
+    attributes:
+      label: Prompt usato
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output ottenuto
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Output atteso
+    validations:
+      required: true
+  - type: dropdown
+    id: variant
+    attributes:
+      label: Variante del modello
+      options: [k3-nano, k3-small, k3-base, k3-large]
+    validations:
+      required: true
+  - type: textarea
+    id: sampling
+    attributes:
+      label: Parametri di sampling
+      placeholder: "temperature, top_p, min_p, max_tokens, seed"
+  - type: dropdown
+    id: category
+    attributes:
+      label: Categoria del problema
+      options:
+        - Allucinazione fattuale
+        - Errore di ragionamento
+        - Errore di codice
+        - Mancato rispetto delle istruzioni
+        - Problema linguistico
+        - Rifiuto improprio
+        - Contenuto non sicuro
+    validations:
+      required: true
+  - type: input
+    id: reproducibility
+    attributes:
+      label: Riproducibilità
+      placeholder: "es. 8 volte su 10"

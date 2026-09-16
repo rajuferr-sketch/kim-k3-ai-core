@@ -1,0 +1,39 @@
+name: ⚡ Performance
+description: Problemi di throughput, latenza o consumo di memoria
+labels: ["type:perf", "status:needs-triage"]
+body:
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Fase interessata
+      options: [training, inference, data pipeline, evaluation]
+    validations:
+      required: true
+  - type: textarea
+    id: measurement
+    attributes:
+      label: Misurazioni
+      placeholder: |
+        Throughput osservato: ... tok/s
+        Throughput atteso: ... tok/s
+        Memoria picco: ... GB
+        Latenza p50 / p95: ... ms
+    validations:
+      required: true
+  - type: textarea
+    id: hardware
+    attributes:
+      label: Hardware
+      placeholder: "GPU, VRAM, numero di nodi, interconnessione, CPU, RAM"
+    validations:
+      required: true
+  - type: textarea
+    id: config
+    attributes:
+      label: Configurazione usata
+      render: yaml
+  - type: textarea
+    id: profile
+    attributes:
+      label: Profiling
+      description: Output di torch.profiler, nsys o simili, se disponibile

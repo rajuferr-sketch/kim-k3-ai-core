@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Domande e discussioni
+    url: https://github.com/rajuferr-sketch/kim-k3-ai-core/discussions
+    about: Per domande d'uso, idee e confronto con la community.
+  - name: 🔐 Segnalazione di sicurezza
+    url: https://github.com/rajuferr-sketch/kim-k3-ai-core/security/advisories/new
+    about: Segnala vulnerabilità in privato, non aprire una issue pubblica.

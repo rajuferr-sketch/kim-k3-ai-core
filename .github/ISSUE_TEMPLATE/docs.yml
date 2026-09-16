@@ -1,0 +1,27 @@
+name: 📖 Documentazione
+description: Documentazione mancante, errata o poco chiara
+labels: ["type:docs", "status:needs-triage"]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Pagina o file interessato
+      placeholder: "docs/training.md"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Cosa manca o è sbagliato
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Correzione proposta
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Disponibilità
+      options:
+        - label: Sono disponibile ad aprire una PR con la correzione
