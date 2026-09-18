@@ -1,0 +1,54 @@
+name: Benchmark
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+    inputs:
+      config:
+        description: Configurazione del modello da valutare
+        type: choice
+        default: k3-small
+        options: [k3-nano, k3-small, k3-base, k3-large, k3-ultra]
+      suite:
+        description: Suite di benchmark
+        type: choice
+        default: smoke
+        options: [smoke, full]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: benchmark-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  eval:
+    name: Valutazione ${{ inputs.config || 'k3-small' }}
+    runs-on: [self-hosted, gpu]
+    timeout-minutes: 720
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -e ".[eval]"
+      - name: Esegui suite
+        run: |
+          python -m kimk3.eval.run \
+            --config configs/${{ inputs.config || 'k3-small' }}.yaml \
+            --suite ${{ inputs.suite || 'smoke' }} \
+            --out artifacts/eval.json
+      - name: Confronto con la baseline
+        run: python -m kimk3.eval.compare --current artifacts/eval.json --baseline benchmarks/baseline.json --tolerance 0.005
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-${{ inputs.config || 'k3-small' }}
+          path: artifacts/
+          retention-days: 90
