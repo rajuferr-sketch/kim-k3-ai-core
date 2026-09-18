@@ -1,0 +1,45 @@
+name: "Problema di sicurezza (non sensibile)"
+description: Rischi di policy, prompt injection, uso improprio degli strumenti
+title: "[sicurezza] "
+labels: ["tipo: sicurezza", "priorità: P1", "stato: triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Non aprire qui vulnerabilità sfruttabili.** Per quelle usa la segnalazione privata
+        descritta in `SECURITY.md`. Questo modulo serve a rischi generali e miglioramenti di policy.
+  - type: dropdown
+    id: categoria
+    attributes:
+      label: Categoria
+      options:
+        - Prompt injection da contenuto non fidato
+        - Esfiltrazione di dati o segreti
+        - Escalation di permessi degli strumenti
+        - Output dannoso o non conforme alla policy
+        - Sandbox o limiti di esecuzione
+        - Altro
+    validations:
+      required: true
+  - type: textarea
+    id: descrizione
+    attributes:
+      label: Descrizione del rischio
+    validations:
+      required: true
+  - type: textarea
+    id: riproduzione
+    attributes:
+      label: Passi per riprodurre
+      render: text
+  - type: textarea
+    id: mitigazione
+    attributes:
+      label: Mitigazione proposta
+  - type: checkboxes
+    id: check
+    attributes:
+      label: Conferma
+      options:
+        - label: Confermo che non si tratta di una vulnerabilità sfruttabile non divulgata
+          required: true

@@ -1,0 +1,26 @@
+name: Labeler
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/labeler@v5
+        with:
+          configuration-path: .github/labeler-config.yml
+          sync-labels: true
+      - name: Etichetta per dimensione
+        uses: codelytv/pr-size-labeler@v1
+        with:
+          xs_max_size: 20
+          s_max_size: 100
+          m_max_size: 400
+          l_max_size: 1000
+          fail_if_xl: false

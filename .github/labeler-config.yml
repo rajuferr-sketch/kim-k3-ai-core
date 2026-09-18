@@ -1,0 +1,41 @@
+# Mappatura percorso -> etichetta usata da .github/workflows/labeler.yml
+
+"area: modello":
+  - changed-files:
+      - any-glob-to-any-file: ["src/kimk3/model/**"]
+
+"area: tokenizer":
+  - changed-files:
+      - any-glob-to-any-file: ["src/kimk3/tokenizer/**"]
+
+"area: dati":
+  - changed-files:
+      - any-glob-to-any-file: ["src/kimk3/data/**"]
+
+"area: training":
+  - changed-files:
+      - any-glob-to-any-file: ["src/kimk3/train/**", "configs/k3-*.yaml"]
+
+"area: inferenza":
+  - changed-files:
+      - any-glob-to-any-file: ["src/kimk3/infer/**"]
+
+"area: agenti":
+  - changed-files:
+      - any-glob-to-any-file: ["src/kimk3/agents/**", "configs/agents/**", "AGENTS.md"]
+
+"area: valutazione":
+  - changed-files:
+      - any-glob-to-any-file: ["src/kimk3/eval/**", "benchmarks/**"]
+
+"area: documentazione":
+  - changed-files:
+      - any-glob-to-any-file: ["docs/**", "**/*.md"]
+
+"area: ci":
+  - changed-files:
+      - any-glob-to-any-file: [".github/**"]
+
+"area: test":
+  - changed-files:
+      - any-glob-to-any-file: ["tests/**"]

@@ -1,0 +1,72 @@
+name: "Segnalazione sciame di agenti"
+description: Problema o proposta relativa ai 15 agenti (Router, Planner, Critic, ...)
+title: "[agenti] "
+labels: ["tipo: bug", "area: agenti", "stato: triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Usa questo modulo per segnalare comportamenti anomali dello sciame di 15 agenti
+        descritto in `docs/swarm.md` e configurato in `configs/agents/swarm.yaml`.
+  - type: dropdown
+    id: agente
+    attributes:
+      label: Agente coinvolto
+      multiple: true
+      options:
+        - Router
+        - Coordinator
+        - Planner
+        - Memory
+        - Research
+        - Reasoning
+        - Data
+        - Tool
+        - Coding
+        - Executor
+        - Critic
+        - Verifier
+        - Safety
+        - Synthesizer
+        - Evaluator
+    validations:
+      required: true
+  - type: dropdown
+    id: fase
+    attributes:
+      label: Fase della pipeline
+      options: [route, coordinate, plan, gather, build, challenge, verify, synthesize, score, deliver]
+    validations:
+      required: true
+  - type: textarea
+    id: atteso
+    attributes:
+      label: Comportamento atteso
+    validations:
+      required: true
+  - type: textarea
+    id: osservato
+    attributes:
+      label: Comportamento osservato
+    validations:
+      required: true
+  - type: textarea
+    id: trace
+    attributes:
+      label: Trace della sessione
+      description: Incolla il log JSON degli step (tool call, osservazioni, punteggi Evaluator).
+      render: json
+  - type: input
+    id: config
+    attributes:
+      label: Configurazione usata
+      placeholder: configs/k3-ultra.yaml + configs/agents/swarm.yaml
+  - type: checkboxes
+    id: check
+    attributes:
+      label: Verifiche
+      options:
+        - label: Ho rimosso segreti e dati personali dal trace
+          required: true
+        - label: Ho cercato issue duplicate
+          required: true
