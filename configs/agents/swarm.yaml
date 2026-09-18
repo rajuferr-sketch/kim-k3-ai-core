@@ -1,0 +1,163 @@
+# Kim K3 — configurazione dello sciame di agenti
+# Ogni richiesta attiva TUTTI gli agenti elencati. Un agente può rispondere `skip`.
+
+version: 1
+name: kim-k3-swarm
+activation: always            # lo sciame parte su ogni richiesta, senza eccezioni
+model_default: k3-ultra       # 800B totali, 40B attivi per token
+model_light: k3-nano          # usato dal Router per la classificazione
+
+budget:
+  tool_calls: 40
+  seconds: 360
+  tokens: 800000
+  review_rounds: 2
+  repair_rounds: 1
+  delegation_depth: 2
+
+levels:
+  L1: { name: lampo,    max_seconds: 30,  parallel: true }
+  L2: { name: standard, max_seconds: 120, parallel: true }
+  L3: { name: profondo, max_seconds: 300, parallel: true }
+  L4: { name: critico,  max_seconds: 360, parallel: true, human_in_the_loop: true }
+
+agents:
+  - id: router
+    role: Router Agent
+    phase: route
+    model: k3-nano
+    timeout: 10
+    permissions: []
+    outputs: [level, agent_plan, model_choice]
+
+  - id: coordinator
+    role: Coordinator Agent
+    phase: coordinate
+    timeout: 15
+    depends_on: [router]
+    permissions: [bus, state]
+    outputs: [task_dag]
+
+  - id: planner
+    role: Planner Agent
+    phase: plan
+    timeout: 20
+    depends_on: [coordinator]
+    permissions: []
+    outputs: [steps, acceptance]
+
+  - id: memory
+    role: Memory Agent
+    phase: plan
+    timeout: 10
+    depends_on: [coordinator]
+    permissions: [vector_store, episodic_store]
+    outputs: [context_fragments]
+    compaction_threshold: 0.8
+
+  - id: research
+    role: Research Agent
+    phase: gather
+    timeout: 30
+    parallel_group: gather
+    permissions: [search_web, read_url]
+    outputs: [findings]
+    require_sources: true
+
+  - id: reasoning
+    role: Reasoning Agent
+    phase: gather
+    timeout: 60
+    parallel_group: gather
+    permissions: []
+    outputs: [deductions, alternatives]
+
+  - id: data
+    role: Data Agent
+    phase: gather
+    timeout: 45
+    parallel_group: gather
+    permissions: [sql_query, run_python]
+    outputs: [tables, statistics]
+
+  - id: tool
+    role: Tool Agent
+    phase: gather
+    timeout: 30
+    parallel_group: gather
+    permissions: [tool_allowlist]
+    outputs: [tool_results]
+
+  - id: coding
+    role: Coding Agent
+    phase: build
+    timeout: 120
+    depends_on: [planner, research, reasoning]
+    permissions: [workspace_write, run_python]
+    outputs: [patch, tests]
+    require_tests: true
+
+  - id: executor
+    role: Executor Agent
+    phase: build
+    timeout: 120
+    depends_on: [coding, safety]
+    permissions: [shell_allowlist, write_file]
+    outputs: [action_results]
+    blocked_by_safety: true
+
+  - id: critic
+    role: Critic Agent
+    phase: challenge
+    timeout: 30
+    depends_on: [coding, executor, reasoning]
+    permissions: []
+    outputs: [defects]
+
+  - id: verifier
+    role: Verifier Agent
+    phase: verify
+    timeout: 45
+    depends_on: [critic]
+    permissions: [read_url, run_python]
+    outputs: [claim_checks]
+    fail_action: return_to_coordinator
+
+  - id: safety
+    role: Safety Agent
+    phase: continuous
+    timeout: 15
+    permissions: [veto]
+    outputs: [verdict]     # allow | restrict | block
+
+  - id: synthesizer
+    role: Synthesizer Agent
+    phase: synthesize
+    timeout: 45
+    depends_on: [verifier, safety]
+    permissions: []
+    outputs: [final_answer]
+
+  - id: evaluator
+    role: Evaluator Agent
+    phase: score
+    timeout: 20
+    depends_on: [synthesizer]
+    permissions: []
+    outputs: [score, verdict]
+    threshold: 0.8
+
+rubric:
+  correttezza: 0.30
+  completezza: 0.20
+  verificabilita: 0.20
+  chiarezza: 0.15
+  sicurezza: 0.10
+  costo: 0.05
+
+security:
+  untrusted_sources: [research, tool, data]
+  secrets_in_prompt: false
+  sandbox_network: false
+  audit_log: true
+  human_confirmation_for: [delete, payment, send, deploy, external_write]
