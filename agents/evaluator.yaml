@@ -1,0 +1,50 @@
+# Evaluator Agent - manifest
+# Loaded by src/kim_k3/agents/registry.py at startup.
+name: evaluator
+class: kim_k3.agents.evaluator_agent.EvaluatorAgent
+title: "Evaluator Agent"
+version: 1.0.0
+order: 14
+enabled: true
+always_activate: true          # every request activates this agent (pipeline is mandatory)
+role: >
+  Scores the quality of the output against defined criteria.
+
+model:
+  tier: balanced
+  temperature: 0.0
+  max_output_tokens: 4096
+
+limits:
+  max_steps: 10
+  max_credits: 110
+  timeout_seconds: 150
+  max_delegation_depth: 1
+
+tools:
+  - memory.recall
+
+memory:
+  read: [working, episodic, semantic]
+  write: [working]
+
+inputs:
+  - draft answer
+  - Plan acceptance criteria
+  - Critique
+  - VerificationReport
+
+outputs:
+  - Evaluation: scores, verdict, required revisions
+
+stop_conditions:
+  - max_steps reached
+  - max_credits reached
+  - budget guard refused the next provider call
+  - safety verdict is refuse
+  - two consecutive empty or malformed outputs
+
+escalation:
+  on_failure: report_to_coordinator
+  on_policy_hit: safety
+  on_budget_exhausted: halt_run

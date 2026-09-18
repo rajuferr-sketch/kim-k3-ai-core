@@ -1,0 +1,49 @@
+# Reasoning Agent - manifest
+# Loaded by src/kim_k3/agents/registry.py at startup.
+name: reasoning
+class: kim_k3.agents.reasoning_agent.ReasoningAgent
+title: "Reasoning Agent"
+version: 1.0.0
+order: 5
+enabled: true
+always_activate: true          # every request activates this agent (pipeline is mandatory)
+role: >
+  Analyses complex problems and builds explicit deductive chains.
+
+model:
+  tier: deep
+  temperature: 0.2
+  max_output_tokens: 4096
+
+limits:
+  max_steps: 16
+  max_credits: 200
+  timeout_seconds: 240
+  max_delegation_depth: 1
+
+tools:
+  - memory.recall
+
+memory:
+  read: [working, episodic, semantic]
+  write: [working]
+
+inputs:
+  - Plan
+  - Evidence[]
+  - problem statement
+
+outputs:
+  - ReasoningTrace: premises, steps, conclusions, assumptions, confidence
+
+stop_conditions:
+  - max_steps reached
+  - max_credits reached
+  - budget guard refused the next provider call
+  - safety verdict is refuse
+  - two consecutive empty or malformed outputs
+
+escalation:
+  on_failure: report_to_coordinator
+  on_policy_hit: safety
+  on_budget_exhausted: halt_run

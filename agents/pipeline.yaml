@@ -1,0 +1,65 @@
+# kim-k3 multi-agent pipeline
+# Every request activates all 15 agents. Order and concurrency are defined here;
+# the orchestrator (src/kim_k3/agents/orchestrator.py) executes this contract.
+
+version: 1
+activation: all          # all | routed  -- "all" is the product default
+max_revision_loops: 2
+run_budget_credits: 2000
+hard_timeout_seconds: 600
+
+stages:
+  - id: route
+    agents: [router]
+  - id: coordinate
+    agents: [coordinator]
+  - id: safety_preflight
+    agents: [safety]
+    abort_run_if: "decision == refuse"
+  - id: recall
+    agents: [memory]
+  - id: gather
+    agents: [research, planner]
+    concurrent: true
+  - id: reason
+    agents: [reasoning]
+  - id: produce
+    agents: [data, coding]
+    concurrent: true
+  - id: act
+    agents: [tool, executor]
+    requires_safety_clearance: true
+  - id: review
+    agents: [critic, verifier]
+    concurrent: true
+  - id: safety_precommit
+    agents: [safety]
+  - id: evaluate
+    agents: [evaluator]
+    on_verdict_revise: replan
+  - id: consolidate
+    agents: [memory]
+  - id: synthesize
+    agents: [synthesizer]
+
+budgets:
+  router: 40
+  coordinator: 120
+  research: 150
+  planner: 90
+  reasoning: 200
+  data: 180
+  coding: 250
+  tool: 140
+  executor: 200
+  critic: 130
+  verifier: 160
+  safety: 60
+  memory: 120
+  evaluator: 110
+  synthesizer: 150
+
+failure_policy:
+  agent_error: continue_with_partial
+  safety_refuse: halt_and_explain
+  budget_exhausted: halt_and_return_partial

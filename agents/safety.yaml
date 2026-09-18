@@ -1,0 +1,49 @@
+# Safety Agent - manifest
+# Loaded by src/kim_k3/agents/registry.py at startup.
+name: safety
+class: kim_k3.agents.safety_agent.SafetyAgent
+title: "Safety Agent"
+version: 1.0.0
+order: 12
+enabled: true
+always_activate: true          # every request activates this agent (pipeline is mandatory)
+role: >
+  Checks risk, policy compliance and problematic requests.
+
+model:
+  tier: fast
+  temperature: 0.0
+  max_output_tokens: 4096
+
+limits:
+  max_steps: 8
+  max_credits: 60
+  timeout_seconds: 120
+  max_delegation_depth: 1
+
+tools:
+  - policy.read
+
+memory:
+  read: [working, episodic, semantic]
+  write: [working]
+
+inputs:
+  - request
+  - planned actions
+  - draft answer
+
+outputs:
+  - SafetyVerdict: decision, matched policies, required constraints
+
+stop_conditions:
+  - max_steps reached
+  - max_credits reached
+  - budget guard refused the next provider call
+  - safety verdict is refuse
+  - two consecutive empty or malformed outputs
+
+escalation:
+  on_failure: report_to_coordinator
+  on_policy_hit: safety
+  on_budget_exhausted: halt_run

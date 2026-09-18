@@ -1,0 +1,50 @@
+# Critic Agent - manifest
+# Loaded by src/kim_k3/agents/registry.py at startup.
+name: critic
+class: kim_k3.agents.critic_agent.CriticAgent
+title: "Critic Agent"
+version: 1.0.0
+order: 10
+enabled: true
+always_activate: true          # every request activates this agent (pipeline is mandatory)
+role: >
+  Looks for errors, gaps and inconsistencies in the work of the other agents.
+
+model:
+  tier: balanced
+  temperature: 0.2
+  max_output_tokens: 4096
+
+limits:
+  max_steps: 12
+  max_credits: 130
+  timeout_seconds: 180
+  max_delegation_depth: 1
+
+tools:
+  - memory.recall
+
+memory:
+  read: [working, episodic, semantic]
+  write: [working]
+
+inputs:
+  - Plan
+  - ReasoningTrace
+  - draft answer
+  - artifacts
+
+outputs:
+  - Critique: findings[] with severity, location, suggested fix
+
+stop_conditions:
+  - max_steps reached
+  - max_credits reached
+  - budget guard refused the next provider call
+  - safety verdict is refuse
+  - two consecutive empty or malformed outputs
+
+escalation:
+  on_failure: report_to_coordinator
+  on_policy_hit: safety
+  on_budget_exhausted: halt_run

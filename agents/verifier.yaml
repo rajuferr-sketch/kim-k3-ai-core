@@ -1,0 +1,52 @@
+# Verifier Agent - manifest
+# Loaded by src/kim_k3/agents/registry.py at startup.
+name: verifier
+class: kim_k3.agents.verifier_agent.VerifierAgent
+title: "Verifier Agent"
+version: 1.0.0
+order: 11
+enabled: true
+always_activate: true          # every request activates this agent (pipeline is mandatory)
+role: >
+  Verifies facts, calculations and outputs independently.
+
+model:
+  tier: balanced
+  temperature: 0.0
+  max_output_tokens: 4096
+
+limits:
+  max_steps: 14
+  max_credits: 160
+  timeout_seconds: 210
+  max_delegation_depth: 1
+
+tools:
+  - web.fetch
+  - code.sandbox
+  - calc.eval
+
+memory:
+  read: [working, episodic, semantic]
+  write: [working]
+
+inputs:
+  - claims[]
+  - numbers
+  - code artifacts
+  - sources
+
+outputs:
+  - VerificationReport: per-claim status, evidence, recomputation
+
+stop_conditions:
+  - max_steps reached
+  - max_credits reached
+  - budget guard refused the next provider call
+  - safety verdict is refuse
+  - two consecutive empty or malformed outputs
+
+escalation:
+  on_failure: report_to_coordinator
+  on_policy_hit: safety
+  on_budget_exhausted: halt_run

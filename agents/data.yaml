@@ -1,0 +1,50 @@
+# Data Agent - manifest
+# Loaded by src/kim_k3/agents/registry.py at startup.
+name: data
+class: kim_k3.agents.data_agent.DataAgent
+title: "Data Agent"
+version: 1.0.0
+order: 6
+enabled: true
+always_activate: true          # every request activates this agent (pipeline is mandatory)
+role: >
+  Analyses datasets, computes statistics and interprets numerical results.
+
+model:
+  tier: balanced
+  temperature: 0.2
+  max_output_tokens: 4096
+
+limits:
+  max_steps: 14
+  max_credits: 180
+  timeout_seconds: 210
+  max_delegation_depth: 1
+
+tools:
+  - data.load
+  - data.query
+  - code.sandbox
+
+memory:
+  read: [working, episodic, semantic]
+  write: [working]
+
+inputs:
+  - dataset reference or inline data
+  - analysis question
+
+outputs:
+  - DataFindings: metrics, tables, caveats, reproduction snippet
+
+stop_conditions:
+  - max_steps reached
+  - max_credits reached
+  - budget guard refused the next provider call
+  - safety verdict is refuse
+  - two consecutive empty or malformed outputs
+
+escalation:
+  on_failure: report_to_coordinator
+  on_policy_hit: safety
+  on_budget_exhausted: halt_run

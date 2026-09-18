@@ -1,0 +1,50 @@
+# Coordinator Agent - manifest
+# Loaded by src/kim_k3/agents/registry.py at startup.
+name: coordinator
+class: kim_k3.agents.coordinator_agent.CoordinatorAgent
+title: "Coordinator Agent"
+version: 1.0.0
+order: 2
+enabled: true
+always_activate: true          # every request activates this agent (pipeline is mandatory)
+role: >
+  Assigns tasks to the other agents and owns the execution flow of the run.
+
+model:
+  tier: balanced
+  temperature: 0.2
+  max_output_tokens: 4096
+
+limits:
+  max_steps: 24
+  max_credits: 120
+  timeout_seconds: 360
+  max_delegation_depth: 1
+
+tools:
+  - registry.read
+  - run.state
+
+memory:
+  read: [working, episodic, semantic]
+  write: [working]
+
+inputs:
+  - RoutingDecision
+  - agent registry
+  - run context
+
+outputs:
+  - RunPlan and ordered AgentResult list
+
+stop_conditions:
+  - max_steps reached
+  - max_credits reached
+  - budget guard refused the next provider call
+  - safety verdict is refuse
+  - two consecutive empty or malformed outputs
+
+escalation:
+  on_failure: report_to_coordinator
+  on_policy_hit: safety
+  on_budget_exhausted: halt_run

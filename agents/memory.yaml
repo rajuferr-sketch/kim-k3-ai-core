@@ -1,0 +1,51 @@
+# Memory Agent - manifest
+# Loaded by src/kim_k3/agents/registry.py at startup.
+name: memory
+class: kim_k3.agents.memory_agent.MemoryAgent
+title: "Memory Agent"
+version: 1.0.0
+order: 13
+enabled: true
+always_activate: true          # every request activates this agent (pipeline is mandatory)
+role: >
+  Manages context, relevant information and the state of the work.
+
+model:
+  tier: fast
+  temperature: 0.2
+  max_output_tokens: 4096
+
+limits:
+  max_steps: 12
+  max_credits: 120
+  timeout_seconds: 180
+  max_delegation_depth: 1
+
+tools:
+  - memory.recall
+  - memory.write
+  - memory.promote
+
+memory:
+  read: [working, episodic, semantic]
+  write: [working, episodic, semantic]
+
+inputs:
+  - request
+  - run trace
+  - agent outputs
+
+outputs:
+  - MemoryBundle: recalled items, working summary, promotions
+
+stop_conditions:
+  - max_steps reached
+  - max_credits reached
+  - budget guard refused the next provider call
+  - safety verdict is refuse
+  - two consecutive empty or malformed outputs
+
+escalation:
+  on_failure: report_to_coordinator
+  on_policy_hit: safety
+  on_budget_exhausted: halt_run
